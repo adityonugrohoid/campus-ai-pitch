@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Kampus — Asisten Cerdas untuk Universitas Anda</title>
+    <style>
+        /* ── Reset & Base ──────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #111638;
+            --bg-card: #161b44;
+            --accent: #25D366;
+            --accent-dark: #128C7E;
+            --text-primary: #e8eaf6;
+            --text-secondary: #9fa8da;
+            --text-muted: #5c6bc0;
+            --wa-green: #25D366;
+            --wa-dark: #075E54;
+            --wa-light: #DCF8C6;
+            --wa-bubble: #005C4B;
+            --wa-bg: #0B141A;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── Utility ───────────────────────────────────── */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section {
+            padding: 64px 0;
+        }
+
+        /* ── Hero ──────────────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -30%;
+            width: 160%;
+            height: 140%;
+            background: radial-gradient(ellipse at 50% 30%, rgba(37, 211, 102, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(37, 211, 102, 0.1);
+            border: 1px solid rgba(37, 211, 102, 0.2);
+            color: var(--wa-green);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 32px 0 24px;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--wa-green);
+            line-height: 1;
+        }
+
+        .stat-label {
+            text-align: left;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .hero-sub {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .scroll-hint {
+            margin-top: 40px;
+            animation: bounce 2s infinite;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .scroll-hint span {
+            display: block;
+            font-size: 1.5rem;
+            margin-top: 4px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ── Problem Section ───────────────────────────── */
+        .problem { background: var(--bg-secondary); }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            line-height: 1.3;
+        }
+
+        .pain-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .pain-card:active {
+            transform: scale(0.98);
+        }
+
+        .pain-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .pain-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .pain-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ── Solution Section ──────────────────────────── */
+        .solution-intro {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        /* WhatsApp Chat Mockup */
+        .wa-mockup {
+            background: var(--wa-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            margin: 32px 0;
+        }
+
+        .wa-header {
+            background: var(--wa-dark);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wa-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--wa-green), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .wa-header-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .wa-header-info p {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .wa-chat {
+            padding: 16px;
+            min-height: 320px;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .wa-message {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .wa-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .wa-message.sent {
+            background: var(--wa-bubble);
+            color: #e9edef;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .wa-message.received {
+            background: #202c33;
+            color: #e9edef;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .wa-time {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .wa-typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #202c33;
+            border-radius: 8px;
+            margin-right: auto;
+            max-width: 70px;
+            margin-bottom: 8px;
+            opacity: 0;
+        }
+
+        .wa-typing.visible { opacity: 1; }
+
+        .wa-typing span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: typing 1.4s infinite;
+        }
+
+        .wa-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .wa-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* ── How It Works ──────────────────────────────── */
+        .how { background: var(--bg-secondary); }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--wa-green), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── Stats Section ─────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--wa-green);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* ── Tech Section ──────────────────────────────── */
+        .tech { background: var(--bg-secondary); }
+
+        .tech-point {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .tech-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(37, 211, 102, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .tech-point h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .tech-point p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── CTA Section ───────────────────────────────── */
+        .cta {
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .cta h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .cta p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: var(--wa-green);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 24px rgba(37, 211, 102, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(37, 211, 102, 0.4);
+        }
+
+        .cta-button:active {
+            transform: scale(0.97);
+        }
+
+        .cta-button svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .cta-note {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Footer ────────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 32px 0;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ── Responsive (larger screens) ───────────────── */
+        @media (min-width: 600px) {
+            .container { max-width: 520px; }
+            .hero h1 { font-size: 2.5rem; }
+            .stat-number { font-size: 4rem; }
+            .section-title { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ HERO -->
+<section class="hero">
+    <div class="container">
+        <div class="fade-in">
+            <div class="hero-badge">AI untuk Kampus</div>
+            <h1>Berapa jam staf kampus Anda habiskan menjawab pertanyaan yang sama?</h1>
+            <div class="hero-stat">
+                <div class="stat-number">80%</div>
+                <div class="stat-label">pertanyaan mahasiswa<br>bisa dijawab otomatis</div>
+            </div>
+            <p class="hero-sub">Asisten AI di WhatsApp — paham konteks akademik kampus Anda, menjawab mahasiswa 24/7.</p>
+        </div>
+        <div class="scroll-hint">
+            Geser ke bawah
+            <span>&#8595;</span>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ PROBLEM -->
+<section class="problem section">
+    <div class="container">
+        <div class="fade-in">
+            <div class="section-label">Masalah</div>
+            <h2 class="section-title">Setiap semester, hal yang sama terulang</h2>
+        </div>
+
+        <div class="pain-card fade-in">
+            <div class="pain-icon">&#128241;</div>
+            <h3>Ribuan WA masuk saat KRS dibuka</h3>
+            <p>Mahasiswa membanjiri WhatsApp BAA, kaprodi, dan dosen wali dengan pertanyaan seputar jadwal, mata kuliah, dan prosedur yang sebenarnya sudah tertulis di buku panduan.</p>
+        </div>
+
+        <div class="pain-card fade-in">
+            <div class="pain-icon">&#9200;</div>
+            <h3>Staf menjawab hal yang sama berulang kali</h3>
+            <p>BAA dan admin prodi menghabiskan waktu berjam-jam menjawab pertanyaan serupa. Waktu yang seharusnya bisa dipakai untuk tugas strategis.</p>
+        </div>
+
+        <div class="pain-card fade-in">
+            <div class="pain-icon">&#128548;</div>
+            <h3>Mahasiswa frustrasi — jawaban lambat</h3>
+            <p>Saat peak hours, respons bisa memakan waktu berjam-jam bahkan berhari-hari. Informasi yang diterima sering tidak konsisten antar sumber.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ SOLUTION -->
+<section class="solution section">
+    <div class="container">
+        <div class="fade-in">
+            <div class="section-label">Solusi</div>
+            <h2 class="section-title">AI yang paham konteks kampus Anda</h2>
+            <p class="solution-intro">Asisten WhatsApp yang dilatih khusus menggunakan dokumen kampus Anda — buku panduan, SOP, kalender akademik. Menjawab dalam Bahasa Indonesia, 24 jam sehari.</p>
+        </div>
+
+        <!-- WhatsApp Chat Mockup -->
+        <div class="wa-mockup fade-in" id="waMockup">
+            <div class="wa-header">
+                <div class="wa-avatar">AI</div>
+                <div class="wa-header-info">
+                    <h4>Asisten Kampus AI</h4>
+                    <p>online</p>
+                </div>
+            </div>
+            <div class="wa-chat" id="waChat">
+                <div class="wa-message sent" data-delay="400">
+                    Kak, kapan batas akhir pengisian KRS semester genap?
+                    <div class="wa-time">09:41</div>
+                </div>
+
+                <div class="wa-typing" data-delay="1200">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <div class="wa-message received" data-delay="2200">
+                    Hai! Batas akhir pengisian KRS semester genap 2025/2026 adalah <strong>14 Februari 2026</strong>. Pastikan kamu sudah konsultasi dengan dosen wali sebelum mengunci KRS ya.
+                    <div class="wa-time">09:41</div>
+                </div>
+
+                <div class="wa-message sent" data-delay="3200">
+                    Kalau mau ambil mata kuliah lintas prodi gimana prosedurnya?
+                    <div class="wa-time">09:42</div>
+                </div>
+
+                <div class="wa-typing" data-delay="4000">
+                    <span></span><span></span><span></span>
+                </div>
+
+                <div class="wa-message received" data-delay="5000">
+                    Untuk mata kuliah lintas prodi (program MBKM), kamu perlu:<br><br>
+                    1. Isi formulir permohonan di portal akademik<br>
+                    2. Dapat persetujuan dosen wali<br>
+                    3. Dapat persetujuan kaprodi tujuan<br>
+                    4. Submit ke BAA sebelum batas KRS<br><br>
+                    Formulir bisa diunduh di portal akademik bagian "MBKM". Ada yang lain yang bisa saya bantu?
+                    <div class="wa-time">09:42</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ HOW IT WORKS -->
+<section class="how section">
+    <div class="container">
+        <div class="fade-in">
+            <div class="section-label">Cara Kerja</div>
+            <h2 class="section-title">Tiga langkah untuk memulai</h2>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h3>Kami pelajari dokumen kampus</h3>
+                <p>Buku panduan akademik, SOP, kalender, FAQ — semua dokumen diproses dan dipahami oleh AI.</p>
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h3>AI dilatih khusus untuk kampus Anda</h3>
+                <p>Bukan chatbot generic. AI memahami konteks spesifik: nama prodi, jadwal, prosedur, dan istilah akademik kampus Anda.</p>
+            </div>
+        </div>
+
+        <div class="step fade-in">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h3>Mahasiswa tanya, AI jawab instan</h3>
+                <p>Via WhatsApp — platform yang sudah digunakan sehari-hari. Tidak perlu install aplikasi baru. Tersedia 24/7.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ STATS -->
+<section class="stats section">
+    <div class="container">
+        <div class="fade-in">
+            <div class="section-label">Dampak</div>
+            <h2 class="section-title">Angka yang berbicara</h2>
+        </div>
+
+        <div class="stats-grid fade-in">
+            <div class="stat-card">
+                <div class="number">80%</div>
+                <div class="label">pertanyaan dijawab otomatis tanpa staf</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">&lt;5 dtk</div>
+                <div class="label">waktu respons rata-rata</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">24/7</div>
+                <div class="label">tersedia kapan saja termasuk weekend</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">0</div>
+                <div class="label">aplikasi baru yang perlu diinstall</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ TECH -->
+<section class="tech section">
+    <div class="container">
+        <div class="fade-in">
+            <div class="section-label">Pendekatan Kami</div>
+            <h2 class="section-title">Solusi custom, bukan template</h2>
+        </div>
+
+        <div class="tech-point fade-in">
+            <div class="tech-icon">&#128218;</div>
+            <div>
+                <h3>RAG — berbasis dokumen kampus Anda</h3>
+                <p>AI tidak mengarang jawaban. Setiap respons bersumber dari dokumen resmi kampus Anda yang telah diproses.</p>
+            </div>
+        </div>
+
+        <div class="tech-point fade-in">
+            <div class="tech-icon">&#127981;</div>
+            <div>
+                <h3>Multi-tenant — tiap kampus terisolasi</h3>
+                <p>Data dan knowledge base setiap universitas terpisah sepenuhnya. Privasi terjamin.</p>
+            </div>
+        </div>
+
+        <div class="tech-point fade-in">
+            <div class="tech-icon">&#127470;&#127465;</div>
+            <div>
+                <h3>Native Bahasa Indonesia</h3>
+                <p>Memahami konteks akademik Indonesia: KRS, SKS, MBKM, BAN-PT, dosen wali, dan istilah kampus lokal.</p>
+            </div>
+        </div>
+
+        <div class="tech-point fade-in">
+            <div class="tech-icon">&#9989;</div>
+            <div>
+                <h3>Compliant — sesuai kebijakan WhatsApp 2026</h3>
+                <p>Bukan chatbot general-purpose. Bot kami menjalankan tugas bisnis spesifik — sesuai ketentuan WhatsApp Business API terbaru.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ CTA -->
+<section class="cta">
+    <div class="container fade-in">
+        <h2>Siap mencoba untuk kampus Anda?</h2>
+        <p>Pilot gratis untuk 1 fakultas. Tanpa komitmen. Lihat hasilnya sendiri.</p>
+
+        <a href="https://wa.me/628XXXXXXXXXX?text=Halo%2C%20saya%20tertarik%20dengan%20pilot%20AI%20Kampus%20untuk%20universitas%20kami."
+           class="cta-button"
+           target="_blank"
+           rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Hubungi via WhatsApp
+        </a>
+
+        <p class="cta-note">Pilot gratis — 1 fakultas, 1 bulan</p>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 AI Kampus. Surabaya, Indonesia.</p>
+    </div>
+</footer>
+
+<script>
+    // ── Scroll-based fade-in ──────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ── WhatsApp chat animation ───────────────────────
+    const chatObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateChat();
+                chatObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    const mockup = document.getElementById('waMockup');
+    if (mockup) chatObserver.observe(mockup);
+
+    function animateChat() {
+        const messages = document.querySelectorAll('#waChat .wa-message, #waChat .wa-typing');
+        messages.forEach(msg => {
+            const delay = parseInt(msg.dataset.delay) || 0;
+            setTimeout(() => {
+                msg.classList.add('visible');
+                // Hide typing indicator after next message appears
+                if (msg.classList.contains('wa-typing')) {
+                    const nextMsg = msg.nextElementSibling;
+                    if (nextMsg) {
+                        const nextDelay = parseInt(nextMsg.dataset.delay) || 0;
+                        setTimeout(() => {
+                            msg.style.display = 'none';
+                        }, nextDelay - delay);
+                    }
+                }
+            }, delay);
+        });
+    }
+</script>
+
+</body>
+</html>
